@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrated Coder — Status</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --panel: #131418;
+            --panel-line: rgba(201, 164, 103, 0.16);
+            --hairline: rgba(201, 164, 103, 0.28);
+            --gold: #c9a467;
+            --gold-bright: #e3c690;
+            --ink: #eae7e0;
+            --ink-muted: #8d8c88;
+            --live: #6fa387;
+            --cpu: #c9a467;
+            --ram: #6f9c85;
+            --disk: #a2635f;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html { height: 100%; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* subtle vignette, no grid, no glow blobs */
+        .backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse 60% 45% at 50% 8%, rgba(201, 164, 103, 0.08), transparent 60%),
+                radial-gradient(ellipse 120% 80% at 50% 100%, rgba(0, 0, 0, 0.6), transparent 60%),
+                var(--bg);
+        }
+
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease;
+        }
+
+        .loading-mark {
+            font-family: 'Fraunces', serif;
+            font-size: 1.6rem;
+            font-style: italic;
+            font-weight: 500;
+            color: var(--gold-bright);
+            letter-spacing: 0.02em;
+            margin-bottom: 1.4rem;
+        }
+
+        .loading-rule {
+            width: 40px;
+            height: 1px;
+            background: var(--hairline);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .loading-rule::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -40px;
+            width: 40px; height: 100%;
+            background: var(--gold-bright);
+            animation: sweep 1.2s ease-in-out infinite;
+        }
+
+        @keyframes sweep {
+            0% { left: -40px; }
+            100% { left: 40px; }
+        }
+
+        .loading-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--ink-muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 4.5rem 1.5rem 3rem;
+            position: relative;
+            animation: reveal 0.9s ease both;
+        }
+
+        @keyframes reveal {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .container { animation: none; }
+            .loading-rule::after { animation: none; }
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .wordmark {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 2.9rem;
+            color: var(--ink);
+            letter-spacing: 0.01em;
+        }
+
+        .wordmark span {
+            color: var(--gold-bright);
+        }
+
+        .tagline {
+            margin-top: 0.6rem;
+            font-size: 0.8rem;
+            color: var(--ink-muted);
+            letter-spacing: 0.12em;
+        }
+
+        .brand-rule {
+            width: 56px;
+            height: 1px;
+            background: var(--hairline);
+            margin: 1.4rem auto 0;
+        }
+
+        .panels {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.75rem;
+            width: 100%;
+            max-width: 920px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-line);
+            border-radius: 3px;
+            padding: 1.9rem 2rem;
+            flex: 1;
+            min-width: 300px;
+            max-width: 440px;
+            position: relative;
+        }
+
+        /* quiet corner brackets — a card-holder detail, not a badge */
+        .panel::before, .panel::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-top: 1px solid var(--gold);
+            border-left: 1px solid var(--gold);
+            top: -1px; left: -1px;
+            opacity: 0.7;
+        }
+
+        .panel::after {
+            top: auto; left: auto;
+            bottom: -1px; right: -1px;
+            border-top: none; border-left: none;
+            border-bottom: 1px solid var(--gold);
+            border-right: 1px solid var(--gold);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 1.4rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .panel-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: var(--ink);
+        }
+
+        .live {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--live);
+            letter-spacing: 0.06em;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--live);
+            animation: breathe 2.4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .row:last-child { border-bottom: none; }
+
+        .row-label {
+            font-size: 0.85rem;
+            color: var(--ink-muted);
+        }
+
+        .row-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            color: var(--ink);
+        }
+
+        .metric { padding: 0.65rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .metric:last-child { border-bottom: none; }
+
+        .metric-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-top .row-label { font-size: 0.85rem; }
+        .metric-top .row-value { font-size: 0.88rem; }
+
+        .meter {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            transition: width 0.6s ease;
+        }
+
+        .meter-fill.cpu { background: var(--cpu); }
+        .meter-fill.ram { background: var(--ram); }
+        .meter-fill.disk { background: var(--disk); }
+
+        .sub-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 1.5rem;
+            margin-top: 0.4rem;
+        }
+
+        .sub-grid .row { padding: 0.5rem 0; }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--ink);
+            text-decoration: none;
+            border: 1px solid var(--hairline);
+            border-radius: 3px;
+            background: transparent;
+            transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+        }
+
+        .btn i { font-size: 0.95rem; color: var(--gold); transition: color 0.25s ease; }
+
+        .btn:hover {
+            border-color: var(--gold);
+            color: var(--gold-bright);
+            background: rgba(201, 164, 103, 0.06);
+        }
+
+        .btn:hover i { color: var(--gold-bright); }
+
+        .footer {
+            margin-top: 3.5rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--ink-muted);
+            line-height: 1.8;
+        }
+
+        .footer a {
+            color: var(--gold);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .footer a:hover {
+            color: var(--gold-bright);
+            border-color: var(--gold-bright);
+        }
+
+        @media (max-width: 560px) {
+            .wordmark { font-size: 2.2rem; }
+            .panel { padding: 1.5rem 1.4rem; }
+            .sub-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-mark">Unrated Coder</div>
+        <div class="loading-rule"></div>
+        <div class="loading-text">preparing status</div>
+    </div>
+
+    <div class="backdrop"></div>
+
+    <div class="container">
+        <div class="brand">
+            <div class="wordmark">Unrated <span>Coder</span></div>
+            <div class="tagline">private automation desk</div>
+            <div class="brand-rule"></div>
+        </div>
+
+        <div class="panels">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Bot</div>
+                    <div class="live"><span class="live-dot"></span>live</div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">Status</div>
+                    <div class="row-value">{{bot_status}}</div>
+                </div>
+                <div class="row">
+                    <div class="row-label">Version</div>
+                    <div class="row-value">{{bot_version}}</div>
+                </div>
+                <div class="row">
+                    <div class="row-label">Users</div>
+                    <div class="row-value">{{total_users}}</div>
+                </div>
+                <div class="row">
+                    <div class="row-label">Premium users</div>
+                    <div class="row-value">{{premium_users}}</div>
+                </div>
+                <div class="row">
+                    <div class="row-label">Uptime</div>
+                    <div class="row-value">{{bot_uptime}}</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">System</div>
+                    <div class="live"><span class="live-dot"></span>live</div>
+                </div>
+
+                <div class="row">
+                    <div class="row-label">Uptime</div>
+                    <div class="row-value">{{system_uptime}}</div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-top">
+                        <div class="row-label">CPU</div>
+                        <div class="row-value">{{cpu_usage}}%</div>
+                    </div>
+                    <div class="meter"><div class="meter-fill cpu" style="width: {{cpu_usage}}%"></div></div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-top">
+                        <div class="row-label">RAM</div>
+                        <div class="row-value">{{ram_usage}}%</div>
+                    </div>
+                    <div class="meter"><div class="meter-fill ram" style="width: {{ram_usage}}%"></div></div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-top">
+                        <div class="row-label">Disk</div>
+                        <div class="row-value">{{disk_usage}}%</div>
+                    </div>
+                    <div class="meter"><div class="meter-fill disk" style="width: {{disk_usage}}%"></div></div>
+                </div>
+
+                <div class="sub-grid">
+                    <div class="row"><div class="row-label">Total</div><div class="row-value">{{total_disk}}</div></div>
+                    <div class="row"><div class="row-label">Used</div><div class="row-value">{{used_disk}}</div></div>
+                    <div class="row"><div class="row-label">Free</div><div class="row-value">{{free_disk}}</div></div>
+                    <div class="row"><div class="row-label">Sent</div><div class="row-value">{{system_sent}}</div></div>
+                    <div class="row" style="grid-column: 1 / -1;"><div class="row-label">Received</div><div class="row-value">{{system_recv}}</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="https://t.me/Unrated_Coder" class="btn"><i class="fab fa-telegram-plane"></i> Join Telegram</a>
+            <a href="https://github.com/shinubo28always" class="btn"><i class="fab fa-github"></i> View source</a>
+        </div>
+
+        <div class="footer">
+            <p>© 2023 Unrated Coder — powered by <a href="https://t.me/Unrated_Coder">Unrated Coder</a> — repo: <a href="https://github.com/shinubo28always/adv-RenameBot">adv-RenameBot</a></p>
+            <p>Special thanks to <a href="https://t.me/Unrated_Coder">Unrated Coder</a></p>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                var s = document.getElementById('loadingScreen');
+                s.style.opacity = '0';
+                setTimeout(function () { s.style.display = 'none'; }, 600);
+            }, 500);
+        });
+
+        // Auto refresh removed as requested
+    </script>
+</body>
+</html>

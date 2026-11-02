@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+BotLog.txt
+Metadata/
+Renames/
+workspaces/
+downloads/
+.env

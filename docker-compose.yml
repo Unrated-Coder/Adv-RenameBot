@@ -1,0 +1,32 @@
+services:
+  bot:
+    build: .
+    container_name: adv_rename_bot
+    restart: always
+    environment:
+      - API_ID=${API_ID}
+      - API_HASH=${API_HASH}
+      - BOT_TOKEN=${BOT_TOKEN}
+      - DB_NAME=${DB_NAME:-Adv-RenameBot}
+      - DB_URL=${DB_URL:-mongodb://mongo:27017}
+      - ADMIN=${ADMIN}
+      - LOG_CHANNEL=${LOG_CHANNEL}
+      - STRING_SESSION=${STRING_SESSION:-}
+      - FORCE_SUB=${FORCE_SUB:-}
+      - PORT=${PORT:-8080}
+    ports:
+      - "${HOST_PORT:-8085}:8080"
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    container_name: adv_rename_bot_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
