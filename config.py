@@ -188,7 +188,7 @@ class Txt(object):
 💡 <b>𝐸𝑥𝑎𝑚𝑝𝑙𝑒 :</b> <code>/set_prefix [HEVC]</code> or <code>/set_suffix @Unrated_Coder</code>"""
 
     DEV_TXT = """✨ <b><u>𝑆𝑝𝑒𝑐𝑖𝑎𝑙 𝑇ℎ𝑎𝑛𝑘𝑠 & 𝐶𝑟𝑒𝑑𝑖𝑡𝑠</u></b>
-<blockquote>» <b>𝑆𝑜𝑢𝑟𝑐𝑒 𝐶𝑜𝑑𝑒 :</b> <a href="https://github.com/shinubo28always/adv-RenameBot.git"><b>𝐴𝑑𝑣𝑎𝑛𝑐𝑒𝑑 𝑅𝑒𝑛𝑎𝑚𝑒 𝐵𝑜𝑡</b></a></blockquote>
+<blockquote>» <b>𝑆𝑜𝑢𝑟𝑐𝑒 𝐶𝑜𝑑𝑒 :</b> <a href="https://github.com/Unrated-Coder/adv-RenameBot.git"><b>𝐴𝑑𝑣𝑎𝑛𝑐𝑒𝑑 𝑅𝑒𝑛𝑎𝑚𝑒 𝐵𝑜𝑡</b></a></blockquote>
 <blockquote><b>❣️ <u>𝐷𝑒𝑣𝑒𝑙𝑜𝑝𝑒𝑟𝑠 & 𝑆𝑢𝑝𝑝𝑜𝑟𝑡𝑒𝑟𝑠 :</u></b>
 • <a href="https://t.me/AniReal_Support"><b>Eʀᴇɴ Yᴇᴀɢᴇʀ</b></a>
 • <a href="https://t.me/Og_Luffytaro"><b>Lᴜғғʏᴛᴀʀᴏ シ︎</b></a>
