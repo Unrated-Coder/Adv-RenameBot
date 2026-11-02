@@ -12,14 +12,14 @@
 </a>
 
 <p align="center">
-  <a href="https://github.com/shinubo28always/Adv-RenameBot/network/members">
-    <img src="https://img.shields.io/github/forks/shinubo28always/Adv-RenameBot?style=for-the-badge&color=00f7ff&logo=git&logoColor=000000" alt="Forks" />
+  <a href="https://github.com/Unrated-Coder/Adv-RenameBot/network/members">
+    <img src="https://img.shields.io/github/forks/Unrated-Coder/Adv-RenameBot?style=for-the-badge&color=00f7ff&logo=git&logoColor=000000" alt="Forks" />
   </a>
-  <a href="https://github.com/shinubo28always/Adv-RenameBot/stargazers">
-    <img src="https://img.shields.io/github/stars/shinubo28always/Adv-RenameBot?style=for-the-badge&color=7928ca&logo=star&logoColor=ffffff" alt="Stars" />
+  <a href="https://github.com/Unrated-Coder/Adv-RenameBot/stargazers">
+    <img src="https://img.shields.io/github/stars/Unrated-Coder/Adv-RenameBot?style=for-the-badge&color=7928ca&logo=star&logoColor=ffffff" alt="Stars" />
   </a>
-  <a href="https://github.com/shinubo28always/Adv-RenameBot/issues">
-    <img src="https://img.shields.io/github/issues/shinubo28always/Adv-RenameBot?style=for-the-badge&color=ff007f&logo=github&logoColor=ffffff" alt="Issues" />
+  <a href="https://github.com/Unrated-Coder/Adv-RenameBot/issues">
+    <img src="https://img.shields.io/github/issues/Unrated-Coder/Adv-RenameBot?style=for-the-badge&color=ff007f&logo=github&logoColor=ffffff" alt="Issues" />
   </a>
   <a href="https://t.me/Anireal_Support">
     <img src="https://img.shields.io/badge/Telegram-Support_Group-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram Support" />
@@ -65,10 +65,10 @@
 
 | Platform | Deployment Action |
 | :---: | :---: |
-| **Koyeb** | <a href="https://app.koyeb.com/deploy?type=git&repository=github.com/shinubo28always/-Rename-AdBot&env[BOT_TOKEN]&env[API_ID]&env[API_HASH]&env[WEBHOOK]=True&env[ADMIN]&env[DB_URL]&env[DB_NAME]=Adv-RenameBot&env[FORCE_SUB]&env[START_PIC]&env[LOG_CHANNEL]=You%20Dont%20Need%20LogChannel%20To%20Remove%20This%20Variable&run_command=python%20bot.py&branch=main&name=-renameadvbot"><img src="https://www.koyeb.com/static/images/deploy/button.svg" alt="Deploy to Koyeb" width="160"></a> |
-| **Render** | <a href="https://render.com/deploy?repo=https://github.com/shinubo28always/Adv-RenameBot"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="160"></a> |
+| **Koyeb** | <a href="https://app.koyeb.com/deploy?type=git&repository=github.com/Unrated-Coder/Adv-RenameBot&env[BOT_TOKEN]&env[API_ID]&env[API_HASH]&env[WEBHOOK]=True&env[ADMIN]&env[DB_URL]&env[DB_NAME]=Adv-RenameBot&env[FORCE_SUB]&env[START_PIC]&env[LOG_CHANNEL]=You%20Dont%20Need%20LogChannel%20To%20Remove%20This%20Variable&run_command=python%20bot.py&branch=main&name=adv-renamebot"><img src="https://www.koyeb.com/static/images/deploy/button.svg" alt="Deploy to Koyeb" width="160"></a> |
+| **Render** | <a href="https://render.com/deploy?repo=https://github.com/Unrated-Coder/Adv-RenameBot"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="160"></a> |
 | **Railway** | <a href="https://railway.app/new"><img src="https://railway.app/button.svg" alt="Deploy on Railway" width="160"></a> |
-| **Heroku** | <a href="https://heroku.com/deploy?template=https://github.com/shinubo28always/Adv-Rename-Bot"><img src="https://img.shields.io/badge/Deploy%20To%20Heroku-7928CA?style=for-the-badge&logo=heroku&logoColor=white" alt="Deploy to Heroku" height="32"></a> |
+| **Heroku** | <a href="https://heroku.com/deploy?template=https://github.com/Unrated-Coder/Adv-RenameBot"><img src="https://img.shields.io/badge/Deploy%20To%20Heroku-7928CA?style=for-the-badge&logo=heroku&logoColor=white" alt="Deploy to Heroku" height="32"></a> |
 
 </div>
 
@@ -78,7 +78,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/shinubo28always/Adv-RenameBot.git
+git clone https://github.com/Unrated-Coder/Adv-RenameBot.git
 cd Adv-RenameBot
 
 # Install required dependencies
@@ -167,8 +167,9 @@ This project is built and maintained by:
   </a>
   &nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://t.me/JustThreshold">
-    <img src="https://img.shields.io/badge/Lead%20Sᴜᴅᴏ%20Usᴇʀ00F7FF?style=for-the-badge&logo=telegram&logoColor=black" alt="Sᴜᴅᴏ Usᴇʀ" />
+    <img src="https://img.shields.io/badge/Speed%20Improvement-JustThreshold-00F7FF?style=for-the-badge&logo=telegram&logoColor=black" alt="Sudo User" />
   </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://t.me/Anireal_Support">
     <img src="https://img.shields.io/badge/Developer-Eren%20Yeager-7928CA?style=for-the-badge&logo=telegram&logoColor=white" alt="Eren Yeager" />
   </a>
