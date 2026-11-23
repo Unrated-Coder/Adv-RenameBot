@@ -16,6 +16,8 @@ from plugins.file_rename import app
 from helper.fast_mtproto import enable_fast_mtproto
 from helper.database import unrated_coder
 from helper.premium_check import get_session_info, describe
+from helper.watchdog import start_watchdog
+import os
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -58,6 +60,8 @@ class AdvRenameBot(Client):
         self.max_file_size = bot_settings.get('max_file_size', '2GB')
         self.uploadlimit = Config.UPLOAD_LIMIT_MODE
         Config.BOT = self
+        # Set by helper.watchdog before a self-restart: no notifications at all.
+        silent_restart = os.environ.pop("SILENT_RESTART", "") == "1"
         
         app = aiohttp.web.AppRunner(await web_server())
         await app.setup()
@@ -103,7 +107,7 @@ class AdvRenameBot(Client):
             logging.error(f"Error setting bot commands: {e}", exc_info=True)
             print(f"Eʀʀᴏʀ sᴇᴛᴛɪɴɢ ʙᴏᴛ ᴄᴏᴍᴍᴀɴᴅs: {e}")
 
-        for id in Config.ADMIN:
+        for id in ([] if silent_restart else Config.ADMIN):
             if Config.STRING_SESSION:
                 try: await self.send_message(id, f"🚀 <b><u>𝐵𝑜𝑡 𝑆𝑡𝑎𝑟𝑡𝑒𝑑 —</u></b>\n<blockquote>⚡ <b>2GB+ File Support Enabled!</b>\n\n📌 <b>Note:</b> Telegram Premium Account String Session configured for 2GB+ files support.\n\n✨ <b>{me.first_name} is Now Online & Ready!</b></blockquote>")
                 except: pass
@@ -111,7 +115,7 @@ class AdvRenameBot(Client):
                 try: await self.send_message(id, f"🚀 <b><u>𝐵𝑜𝑡 𝑆𝑡𝑎𝑟𝑡𝑒𝑑 —</u></b>\n<blockquote>⚡ <b>2GB- File Support Enabled!</b>\n\n✨ <b>{me.first_name} is Now Online & Ready!</b></blockquote>")
                 except: pass
                     
-        if Config.LOG_CHANNEL:
+        if Config.LOG_CHANNEL and not silent_restart:
             try:
                 curr = datetime.datetime.now(pytz.timezone("Asia/Kolkata"))
                 date = curr.strftime('%d %B, %Y')
@@ -149,6 +153,7 @@ def main():
         else:
             await asyncio.gather(digital_instance.start())
         
+        start_watchdog()
         await idle()
         
         if Config.STRING_SESSION:
