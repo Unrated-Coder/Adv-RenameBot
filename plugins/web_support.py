@@ -48,6 +48,11 @@ async def get_status():
     
 AdvRenameBot = web.RouteTableDef()
 
+@AdvRenameBot.get("/health", allow_head=True)
+async def health_route_handler(request):
+    # Lightweight (no database): used by uptime pingers and the keep-alive loop.
+    return web.json_response({"status": "ok", "uptime": int(time.time() - Config.BOT_UPTIME)})
+
 @AdvRenameBot.get("/", allow_head=True)
 async def root_route_handler(request):
     status_data = await get_status()
