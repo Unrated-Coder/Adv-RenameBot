@@ -1,4 +1,5 @@
 from pyrogram import Client, filters
+from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ForceReply
 import logging
 
@@ -7,6 +8,28 @@ from helper.database import unrated_coder
 from plugins.file_rename import app
 
 logger = logging.getLogger(__name__)
+
+
+async def verify_premium_session():
+    """Return (ok, reason). Starts the STRING_SESSION client if needed and
+    checks that the account really has Telegram Premium."""
+    if not Config.STRING_SESSION:
+        return False, "STRING_SESSION not configured!"
+    try:
+        if not getattr(app, "is_connected", False):
+            try:
+                await app.start()
+            except ConnectionError:
+                # already started elsewhere - fine
+                pass
+        me = await app.get_me()
+        if getattr(me, "is_premium", False):
+            return True, ""
+        return False, "STRING_SESSION account is not Premium!"
+    except Exception as e:
+        logger.error(f"Error verifying STRING_SESSION: {e}", exc_info=True)
+        return False, f"Session verification failed: {e}."
+
 
 async def build_settings_panel(client):
     settings = await unrated_coder.get_bot_settings()
@@ -265,41 +288,36 @@ async def settings_callback(client, query: CallbackQuery):
             pass
 
     elif action == "set_max_size":
-        selected_size = parts[2]
+        selected_size = parts[2] if len(parts) > 2 else "2GB"
+        result_msg = ""
 
         if selected_size == "4GB":
-            if not Config.STRING_SESSION:
+            ok, reason = await verify_premium_session()
+            if ok:
+                client.max_file_size = "4GB"
+                await unrated_coder.update_bot_setting("max_file_size", "4GB")
+                result_msg = "✅ STRING_SESSION verified! Max file size set to 4GB."
+            else:
                 client.max_file_size = "2GB"
                 await unrated_coder.update_bot_setting("max_file_size", "2GB")
-                await query.answer("❌ STRING_SESSION not configured! Reverted to 2GB.", show_alert=True)
-            else:
-                try:
-                    if not getattr(app, "is_connected", False):
-                        await app.start()
-                    app_me = await app.get_me()
-                    if getattr(app_me, "is_premium", False):
-                        client.max_file_size = "4GB"
-                        await unrated_coder.update_bot_setting("max_file_size", "4GB")
-                        await query.answer("✅ STRING_SESSION verified! Max file size set to 4GB.", show_alert=True)
-                    else:
-                        client.max_file_size = "2GB"
-                        await unrated_coder.update_bot_setting("max_file_size", "2GB")
-                        await query.answer("❌ STRING_SESSION account is not Premium! Reverted to 2GB.", show_alert=True)
-                except Exception as e:
-                    logger.error(f"Error verifying STRING_SESSION: {e}")
-                    client.max_file_size = "2GB"
-                    await unrated_coder.update_bot_setting("max_file_size", "2GB")
-                    await query.answer(f"❌ Session verification failed: {e}. Reverted to 2GB.", show_alert=True)
+                result_msg = f"❌ {reason} Reverted to 2GB."
         else:
             client.max_file_size = "2GB"
             await unrated_coder.update_bot_setting("max_file_size", "2GB")
-            await query.answer("Max file size set to 2GB.", show_alert=True)
+            result_msg = "Max file size set to 2GB."
+
+        try:
+            await query.answer(result_msg, show_alert=True)
+        except Exception:
+            pass
 
         text, markup = await build_settings_panel(client)
         try:
             await query.message.edit_text(text, reply_markup=markup)
-        except Exception:
+        except MessageNotModified:
             pass
+        except Exception as e:
+            logger.error(f"Failed to refresh settings panel: {e}")
 
     elif action == "main":
         text, markup = await build_settings_panel(client)
