@@ -4,6 +4,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQ
 import logging
 
 from config import Config
+from helper.premium_check import get_session_info, describe
 from helper.database import unrated_coder
 from plugins.file_rename import app
 
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 async def verify_premium_session():
     """Return (ok, reason). Starts the STRING_SESSION client if needed and
-    checks that the account really has Telegram Premium."""
+    asks Telegram whether that exact account has Premium."""
     if not Config.STRING_SESSION:
         return False, "STRING_SESSION not configured!"
     try:
@@ -20,64 +21,18 @@ async def verify_premium_session():
             try:
                 await app.start()
             except ConnectionError:
-                # already started elsewhere - fine
                 pass
-        me = await app.get_me()
-        if getattr(me, "is_premium", False):
+        info = await get_session_info(app)
+        logger.info(f"STRING_SESSION account: {describe(info)} premium={info['premium']} (via {info['source']})")
+        if info["premium"]:
             return True, ""
-        return False, "STRING_SESSION account is not Premium!"
+        return False, (
+            f"STRING_SESSION belongs to {describe(info)} and Telegram reports NO Premium on it. "
+            "Generate the session from the account that has Premium."
+        )
     except Exception as e:
         logger.error(f"Error verifying STRING_SESSION: {e}", exc_info=True)
         return False, f"Session verification failed: {e}."
-
-
-async def build_settings_panel(client):
-    settings = await unrated_coder.get_bot_settings()
-    prem_status = "ON 🟢" if getattr(client, "premium", True) else "OFF 🔴"
-    task_limit_val = getattr(client, "parallel_task_limit", settings.get("parallel_task_limit", 1))
-    task_limit = "♾️ Unlimited" if task_limit_val == 0 else task_limit_val
-    queue_status = "ON 🟢" if getattr(client, "queue_mode", settings.get("queue_mode", True)) else "OFF 🔴"
-    queue_limit_val = getattr(client, "queue_task_limit", settings.get("queue_task_limit", 5))
-    queue_limit = "♾️ Unlimited" if queue_limit_val == 0 else queue_limit_val
-    restart_bc = "ON 🟢" if getattr(client, "restart_broadcast_mode", settings.get("restart_broadcast_mode", True)) else "OFF 🔴"
-    max_size = getattr(client, "max_file_size", settings.get("max_file_size", "2GB"))
-
-    text = (
-        "⚙️ <b><u>𝐵𝑜𝑡 𝐴𝑑𝑚𝑖𝑛 𝑆𝑒𝑡𝑡𝑖𝑛𝑔𝑠</u></b>\n\n"
-        f"• <b>Premium Mode:</b> <code>{prem_status}</code>\n"
-        f"• <b>Parallel Task Limit:</b> <code>{task_limit}</code>\n"
-        f"• <b>Queue Mode:</b> <code>{queue_status}</code>\n"
-        f"• <b>Queue Task Limit:</b> <code>{queue_limit}</code>\n"
-        f"• <b>Restart Broadcast:</b> <code>{restart_bc}</code>\n"
-        f"• <b>Max File Size Mode:</b> <code>{max_size}</code>\n\n"
-        "<i>Select an option below to configure:</i>"
-    )
-
-    buttons = [
-        [
-            InlineKeyboardButton(f"Premium Mode: {prem_status}", callback_data="settings#toggle_premium")
-        ],
-        [
-            InlineKeyboardButton(f"Parallel Task Limit: {task_limit}", callback_data="settings#task_limit_menu")
-        ],
-        [
-            InlineKeyboardButton(f"Queue Mode: {queue_status}", callback_data="settings#toggle_queue")
-        ],
-        [
-            InlineKeyboardButton(f"Queue Task Limit: {queue_limit}", callback_data="settings#queue_limit_menu")
-        ],
-        [
-            InlineKeyboardButton(f"Restart Broadcast: {restart_bc}", callback_data="settings#toggle_restart_bc")
-        ],
-        [
-            InlineKeyboardButton(f"Max File Size: {max_size}", callback_data="settings#max_size_menu")
-        ],
-        [
-            InlineKeyboardButton("❌ Close", callback_data="close")
-        ]
-    ]
-
-    return text, InlineKeyboardMarkup(buttons)
 
 
 @Client.on_message(filters.command("settings") & filters.private & filters.user(Config.ADMIN))
