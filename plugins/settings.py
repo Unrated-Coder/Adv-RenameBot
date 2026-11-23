@@ -35,6 +35,55 @@ async def verify_premium_session():
         return False, f"Session verification failed: {e}."
 
 
+async def build_settings_panel(client):
+    settings = await unrated_coder.get_bot_settings()
+    prem_status = "ON 🟢" if getattr(client, "premium", True) else "OFF 🔴"
+    task_limit_val = getattr(client, "parallel_task_limit", settings.get("parallel_task_limit", 1))
+    task_limit = "♾️ Unlimited" if task_limit_val == 0 else task_limit_val
+    queue_status = "ON 🟢" if getattr(client, "queue_mode", settings.get("queue_mode", True)) else "OFF 🔴"
+    queue_limit_val = getattr(client, "queue_task_limit", settings.get("queue_task_limit", 5))
+    queue_limit = "♾️ Unlimited" if queue_limit_val == 0 else queue_limit_val
+    restart_bc = "ON 🟢" if getattr(client, "restart_broadcast_mode", settings.get("restart_broadcast_mode", True)) else "OFF 🔴"
+    max_size = getattr(client, "max_file_size", settings.get("max_file_size", "2GB"))
+
+    text = (
+        "⚙️ <b><u>𝐵𝑜𝑡 𝐴𝑑𝑚𝑖𝑛 𝑆𝑒𝑡𝑡𝑖𝑛𝑔𝑠</u></b>\n\n"
+        f"• <b>Premium Mode:</b> <code>{prem_status}</code>\n"
+        f"• <b>Parallel Task Limit:</b> <code>{task_limit}</code>\n"
+        f"• <b>Queue Mode:</b> <code>{queue_status}</code>\n"
+        f"• <b>Queue Task Limit:</b> <code>{queue_limit}</code>\n"
+        f"• <b>Restart Broadcast:</b> <code>{restart_bc}</code>\n"
+        f"• <b>Max File Size Mode:</b> <code>{max_size}</code>\n\n"
+        "<i>Select an option below to configure:</i>"
+    )
+
+    buttons = [
+        [
+            InlineKeyboardButton(f"Premium Mode: {prem_status}", callback_data="settings#toggle_premium")
+        ],
+        [
+            InlineKeyboardButton(f"Parallel Task Limit: {task_limit}", callback_data="settings#task_limit_menu")
+        ],
+        [
+            InlineKeyboardButton(f"Queue Mode: {queue_status}", callback_data="settings#toggle_queue")
+        ],
+        [
+            InlineKeyboardButton(f"Queue Task Limit: {queue_limit}", callback_data="settings#queue_limit_menu")
+        ],
+        [
+            InlineKeyboardButton(f"Restart Broadcast: {restart_bc}", callback_data="settings#toggle_restart_bc")
+        ],
+        [
+            InlineKeyboardButton(f"Max File Size: {max_size}", callback_data="settings#max_size_menu")
+        ],
+        [
+            InlineKeyboardButton("❌ Close", callback_data="close")
+        ]
+    ]
+
+    return text, InlineKeyboardMarkup(buttons)
+
+
 @Client.on_message(filters.command("settings") & filters.private & filters.user(Config.ADMIN))
 async def settings_command(client, message):
     text, markup = await build_settings_panel(client)
