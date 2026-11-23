@@ -82,6 +82,31 @@ class Config(object):
     PROGRESS_UPDATE_INTERVAL = max(1.5, float(os.environ.get("PROGRESS_UPDATE_INTERVAL", "4.0")))
     FAST_MTPROTO_SESSIONS = max(4, min(int(os.environ.get("FAST_MTPROTO_SESSIONS", "12")), 16))
     
+    # ---- Watchdog / auto-recovery -------------------------------------
+    # Silent self-restart (no messages sent) when memory is nearly full AND no
+    # task is running, or when the bot is frozen / disconnected.
+    WATCHDOG_ENABLED = os.environ.get("WATCHDOG_ENABLED", "1").lower() not in ("0", "false", "no", "off")
+    # Restart when used memory (container limit if any, else system RAM) >= this %.
+    MEMORY_RESTART_PERCENT = max(50, min(int(os.environ.get("MEMORY_RESTART_PERCENT", "85")), 99))
+    # Optional absolute cap for the bot process itself (MB). 0 = disabled.
+    MEMORY_RESTART_MB = max(0, int(os.environ.get("MEMORY_RESTART_MB", "0")))
+    # Bot must have been idle (no task at all) for this long before a memory restart.
+    IDLE_RESTART_SECONDS = max(10, int(os.environ.get("IDLE_RESTART_SECONDS", "60")))
+    # Never restart for memory earlier than this after (re)start - avoids restart loops.
+    MIN_UPTIME_BEFORE_RESTART = max(60, int(os.environ.get("MIN_UPTIME_BEFORE_RESTART", "600")))
+    WATCHDOG_INTERVAL = max(5, int(os.environ.get("WATCHDOG_INTERVAL", "30")))
+    # Telegram connection health check (ping) every N seconds; restart after N misses.
+    HEALTH_PING_INTERVAL = max(15, int(os.environ.get("HEALTH_PING_INTERVAL", "60")))
+    HEALTH_FAIL_LIMIT = max(2, int(os.environ.get("HEALTH_FAIL_LIMIT", "3")))
+    # If the asyncio event loop makes no progress for this long, it is frozen -> restart.
+    LOOP_FREEZE_SECONDS = max(30, int(os.environ.get("LOOP_FREEZE_SECONDS", "120")))
+    # Keep-alive: the bot pings its own public URL so free hosts (Render/Koyeb/...)
+    # do not put it to sleep. Auto-detected from RENDER_EXTERNAL_URL / KOYEB_PUBLIC_DOMAIN.
+    SELF_PING_URL = (os.environ.get("SELF_PING_URL")
+                     or os.environ.get("RENDER_EXTERNAL_URL")
+                     or (("https://" + os.environ["KOYEB_PUBLIC_DOMAIN"]) if os.environ.get("KOYEB_PUBLIC_DOMAIN") else ""))
+    SELF_PING_INTERVAL = max(60, int(os.environ.get("SELF_PING_INTERVAL", "240")))
+
     #force subs
     try:
         FORCE_SUB = int(os.environ.get("FORCE_SUB", "")) 
