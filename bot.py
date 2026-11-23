@@ -15,6 +15,7 @@ from plugins.web_support import web_server
 from plugins.file_rename import app
 from helper.fast_mtproto import enable_fast_mtproto
 from helper.database import unrated_coder
+from helper.premium_check import get_session_info, describe
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -135,13 +136,13 @@ def main():
         if Config.STRING_SESSION:
             await asyncio.gather(app.start(), digital_instance.start())
             try:
-                app_me = await app.get_me()
-                is_real_premium = bool(getattr(app_me, "is_premium", False))
-                if not is_real_premium:
+                info = await get_session_info(app)
+                logging.info(f"STRING_SESSION account: {describe(info)} | premium={info['premium']} (via {info['source']})")
+                if not info["premium"]:
                     logging.warning(
-                        "STRING_SESSION account does not have an active Telegram "
-                        "Premium subscription - 2GB+/4GB uploads will stay disabled "
-                        "until it does."
+                        f"STRING_SESSION account {describe(info)} does not have an active Telegram "
+                        "Premium subscription - 2GB+/4GB uploads will stay disabled. "
+                        "Make sure the session was generated from the account that bought Premium."
                     )
             except Exception as e:
                 logging.error(f"Could not verify STRING_SESSION premium status: {e}")
