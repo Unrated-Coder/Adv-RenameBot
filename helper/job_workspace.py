@@ -108,6 +108,11 @@ def log_retry(operation: str, attempt: int, reason: str):
     logger.warning("%s retry attempt=%d reason=%s", operation, attempt, reason)
 
 
+def active_operations() -> int:
+    """Number of transfers + FFmpeg jobs currently running (0 means idle)."""
+    return _active_transfers + _active_ffmpeg
+
+
 @asynccontextmanager
 async def measured_operation(operation: str, file_size: int = 0, ffmpeg: bool = False):
     global _active_transfers, _active_ffmpeg
